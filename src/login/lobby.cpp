@@ -1,7 +1,7 @@
 ﻿/*
 ===========================================================================
 
-  Copyright (c) 2010-2015 Darkstar Dev Teams
+  Copyright (c) 2010-2017 Darkstar Dev Teams
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -33,15 +33,8 @@
 #include "login.h"
 #include "lobby.h"
 
-
 int32 login_lobbydata_fd;
 int32 login_lobbyview_fd;
-
-/************************************************************************
-*                                                                       *
-*                                                                       *
-*                                                                       *
-************************************************************************/
 
 int32 connect_client_lobbydata(int32 listenfd)
 {
@@ -57,12 +50,6 @@ int32 connect_client_lobbydata(int32 listenfd)
     }
     return -1;
 }
-
-/************************************************************************
-*                                                                       *
-*                                                                       *
-*                                                                       *
-************************************************************************/
 
 int32 lobbydata_parse(int32 fd)
 {
@@ -381,12 +368,6 @@ int32 lobbydata_parse(int32 fd)
     return 0;
 };
 
-/************************************************************************
-*                                                                       *
-*                                                                       *
-*                                                                       *
-************************************************************************/
-
 int32 do_close_lobbydata(login_session_data_t *loginsd, int32 fd)
 {
     if (loginsd != nullptr)
@@ -410,12 +391,6 @@ int32 do_close_lobbydata(login_session_data_t *loginsd, int32 fd)
     return -1;
 }
 
-/************************************************************************
-*                                                                       *
-*                                                                       *
-*                                                                       *
-************************************************************************/
-
 int32 connect_client_lobbyview(int32 listenfd)
 {
     int32 fd = 0;
@@ -428,12 +403,6 @@ int32 connect_client_lobbyview(int32 listenfd)
     }
     return -1;
 }
-
-/************************************************************************
-*                                                                       *
-*                                                                       *
-*                                                                       *
-************************************************************************/
 
 int32 lobbyview_parse(int32 fd)
 {
@@ -686,24 +655,12 @@ int32 lobbyview_parse(int32 fd)
     return 0;
 };
 
-/************************************************************************
-*                                                                       *
-*                                                                       *
-*                                                                       *
-************************************************************************/
-
 int32 do_close_lobbyview(login_session_data_t* sd, int32 fd)
 {
     ShowInfo(CL_WHITE"lobbyview_parse" CL_RESET": " CL_WHITE"%s" CL_RESET" shutdown the socket\n", sd->login);
     do_close_tcp(fd);
     return 0;
 }
-
-/************************************************************************
-*                                                                       *
-*                                                                       *
-*                                                                       *
-************************************************************************/
 
 int32 lobby_createchar(login_session_data_t *loginsd, int8 *buf)
 {
@@ -775,16 +732,9 @@ int32 lobby_createchar(login_session_data_t *loginsd, int8 *buf)
     return 0;
 };
 
-/************************************************************************
-*                                                                       *
-*                                                                       *
-*                                                                       *
-************************************************************************/
-
 int32 lobby_createchar_save(uint32 accid, uint32 charid, char_mini* createchar)
 {
     const char* Query = "INSERT INTO chars(charid,accid,charname,pos_zone,nation) VALUES(%u,%u,'%s',%u,%u);";
-
     if (Sql_Query(SqlHandle, Query, charid, accid, createchar->m_name, createchar->m_zone, createchar->m_nation) == SQL_ERROR)
     {
         ShowDebug(CL_WHITE"lobby_ccsave" CL_RESET": char<" CL_WHITE"%s" CL_RESET">, accid: %u, charid: %u\n", createchar->m_name, accid, charid);
@@ -792,7 +742,6 @@ int32 lobby_createchar_save(uint32 accid, uint32 charid, char_mini* createchar)
     }
 
     Query = "INSERT INTO char_look(charid,face,race,size) VALUES(%u,%u,%u,%u);";
-
     if (Sql_Query(SqlHandle, Query, charid, createchar->m_look.face, createchar->m_look.race, createchar->m_look.size) == SQL_ERROR)
     {
         ShowDebug(CL_WHITE"lobby_cLook" CL_RESET": char<" CL_WHITE"%s" CL_RESET">, charid: %u\n", createchar->m_name, charid);
@@ -801,7 +750,6 @@ int32 lobby_createchar_save(uint32 accid, uint32 charid, char_mini* createchar)
     }
 
     Query = "INSERT INTO char_stats(charid,mjob) VALUES(%u,%u);";
-
     if (Sql_Query(SqlHandle, Query, charid, createchar->m_mjob) == SQL_ERROR)
     {
         ShowDebug(CL_WHITE"lobby_cStats" CL_RESET": charid: %u\n", charid);
@@ -809,11 +757,7 @@ int32 lobby_createchar_save(uint32 accid, uint32 charid, char_mini* createchar)
         return -1;
     }
 
-
-
-
     // people reported char creation errors, here is a fix.
-
     Query = "INSERT INTO char_exp(charid) VALUES(%u) \
 			ON DUPLICATE KEY UPDATE charid = charid;";
     if (Sql_Query(SqlHandle, Query, charid, createchar->m_mjob) == SQL_ERROR) return -1;
@@ -834,17 +778,12 @@ int32 lobby_createchar_save(uint32 accid, uint32 charid, char_mini* createchar)
 			ON DUPLICATE KEY UPDATE charid = charid;";
     if (Sql_Query(SqlHandle, Query, charid, createchar->m_mjob) == SQL_ERROR) return -1;
 
-
-
     //hot fix
     Query = "DELETE FROM char_inventory WHERE charid = %u";
     if (Sql_Query(SqlHandle, Query, charid) == SQL_ERROR) return -1;
 
     Query = "INSERT INTO char_inventory(charid) VALUES(%u);";
     if (Sql_Query(SqlHandle, Query, charid, createchar->m_mjob) == SQL_ERROR) return -1;
-
-
-
 
     return 0;
 }
