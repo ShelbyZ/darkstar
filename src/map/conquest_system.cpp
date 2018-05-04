@@ -64,6 +64,9 @@ namespace conquest
 
     void UpdateInfluencePoints(int points, unsigned int nation, REGIONTYPE region)
     {
+        // 5000 is max influence for any nation
+        const int32_t MAX_CONQUEST = 5000;
+
         if (region == REGIONTYPE::REGION_UNKNOWN)
         {
             return;
@@ -86,7 +89,7 @@ namespace conquest
             Sql_GetIntData(SqlHandle, 3),
         };
 
-        if (influences[nation] == 5000)
+        if (influences[nation] == MAX_CONQUEST)
             return;
 
         auto lost = 0;
@@ -102,7 +105,7 @@ namespace conquest
             lost += loss;
         }
 
-        influences[nation] += lost;
+        influences[nation] = std::min(influences[nation] + lost, MAX_CONQUEST);
 
         Sql_Query(SqlHandle, "UPDATE conquest_system SET sandoria_influence = %d, bastok_influence = %d, "
             "windurst_influence = %d, beastmen_influence = %d WHERE region_id = %d;", influences[0], influences[1], influences[2], influences[3], region);
